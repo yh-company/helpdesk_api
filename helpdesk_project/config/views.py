@@ -1,12 +1,4 @@
-from django.contrib import admin
-from django.urls import path, include
-from . import views  
+from django.shortcuts import render
 
-urlpatterns = [
-    
-    path('', views.homepage_view, name='homepage'), 
-
-    path('admin/', admin.site.urls),
-    path('tickets/', include('tickets.urls')),
-    path('users/', include('users.urls')),
-]
+def homepage_view(request):
+    return render(request, 'index.html')
