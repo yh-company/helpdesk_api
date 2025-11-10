@@ -93,15 +93,11 @@ WSGI_APPLICATION = 'config.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
+
+
+
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'helpdesk_db',
-        'USER': 'localhost_user',
-        'PASSWORD': '1234',
-        'HOST': 'your_db_host.com', # หรือ 'localhost' ถ้าติดตั้งบนเซิร์ฟเวอร์
-        'PORT': '5432',
-    }
+    'default': dj_database_url.config(default=config('DATABASE_URL'))
 }
 
 
