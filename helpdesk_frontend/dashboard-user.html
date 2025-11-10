@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-R-8">
+    <title>My Tickets</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <h1>My Tickets</h1>
+            <button class="btn btn-primary" id="create-ticket-btn">
+                + Create New Ticket
+            </button>
+        </div>
+
+        <div class="card-list" id="ticket-list">
+            
+            <div class="card">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <h3>My PC is broken!</h3>
+                    <span class="status-tag status-open">OPEN</span>
+                </div>
+                <p>it run out of power instantly when i open it up</p>
+                <small>Priority: HIGH • Last updated: 2 mins ago</small>
+            </div>
+
+            <div class="card">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <h3>Cannot connect to network</h3>
+                    <span class="status-tag status-progress">IN_PROGRESS</span>
+                </div>
+                <p>Assigned to: agent_bob</p>
+                <small>Priority: MEDIUM • Last updated: 1 day ago</small>
+            </div>
+
+            <div class="card">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <h3>Need Photoshop license</h3>
+                    <span class="status-tag status-closed">CLOSED</span>
+                </div>
+                <small>Priority: LOW • Last updated: 5 days ago</small>
+            </div>
+        </div>
+    </div>
+    <script src="js/dashboard-user.js" defer></script>
+</body>
+</html>

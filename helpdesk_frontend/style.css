@@ -1,0 +1,70 @@
+/* ตั้งค่า Font และสีหลัก */
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background-color: #F9FAFB; /* สีขาวอมเทาเล็กน้อย */
+    color: #333;
+    margin: 0;
+    padding: 0;
+}
+
+/* 🎨 Palette สีพาสเทล */
+:root {
+    --white: #FFFFFF;
+    --primary: #BDE0FE; /* Pastel Blue */
+    --primary-text: #004C99;
+    --secondary: #E0E0E0; /* Gray */
+    --open: #D4F8E8;      /* Pastel Green */
+    --open-text: #006D3B;
+    --progress: #FEF8D4;  /* Pastel Yellow */
+    --progress-text: #7A6300;
+    --closed: #FDE2E4;    /* Pastel Red/Pink */
+    --closed-text: #9B1C1C;
+}
+
+/* การ์ด (Card) สไตล์ Minimal */
+.card {
+    background-color: var(--white);
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    padding: 24px;
+    margin-bottom: 20px;
+}
+
+/* ปุ่ม */
+.btn {
+    border: none;
+    border-radius: 6px;
+    padding: 10px 16px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-primary {
+    background-color: var(--primary);
+    color: var(--primary-text);
+}
+.btn-primary:hover {
+    background-color: #a9d4fd; /* เข้มขึ้นเล็กน้อย */
+}
+
+/* Tag สถานะ (Status Tags) */
+.status-tag {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 99px; /* ทรงแคปซูล */
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.status-open { background-color: var(--open); color: var(--open-text); }
+.status-progress { background-color: var(--progress); color: var(--progress-text); }
+.status-closed { background-color: var(--closed); color: var(--closed-text); }
+
+/* Container */
+.container {
+    max-width: 900px;
+    margin: 20px auto;
+    padding: 0 20px;
+}

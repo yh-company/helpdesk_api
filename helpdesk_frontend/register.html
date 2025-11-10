@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-R-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - Help Desk</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* (ใช้สไตล์เดียวกับ login.html) */
+        .login-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            /* (ปรับ height เล็กน้อยเผื่อฟอร์มยาวขึ้น) */
+            padding: 40px 0; 
+            min-height: 100vh;
+            box-sizing: border-box;
+        }
+        .login-card {
+            width: 350px;
+            text-align: center;
+        }
+        .login-card input {
+            width: calc(100% - 20px); /* 100% - padding */
+            padding: 10px;
+            margin-bottom: 12px;
+            border: 1px solid #CCC;
+            border-radius: 6px;
+        }
+        .error-message {
+            color: #D8000C; /* สีแดงสำหรับ Error */
+            background-color: #FFD2D2;
+            padding: 8px;
+            border-radius: 4px;
+            font-size: 14px;
+            margin-bottom: 10px;
+            display: none; /* ซ่อนไว้ก่อน */
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="card login-card">
+            <h2>Create Account</h2>
+            <p>สร้างบัญชีเพื่อเริ่มใช้งาน</p>
+            
+            <div id="error-box" class="error-message"></div>
+
+            <form id="register-form">
+                <input type="text" id="username" placeholder="Username" required>
+                <input type="email" id="email" placeholder="Email" required>
+                <input type="password" id="password" placeholder="Password" required>
+                <input type="text" id="first_name" placeholder="First Name">
+                <input type="text" id="last_name" placeholder="Last Name">
+                
+                <button type="submit" class="btn btn-primary" style="width: 100%;">Register</button>
+            </form>
+            
+            <p style="font-size: 14px; margin-top: 20px;">
+                มีบัญชีอยู่แล้ว? <a href="login.html">Login ที่นี่</a>
+            </p>
+        </div>
+    </div>
+
+    <script src="js/register.js" defer></script>
+</body>
+</html>
