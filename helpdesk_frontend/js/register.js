@@ -1,70 +1,54 @@
-document.addEventListener("DOMContentLoaded", () => {
+// js/register.js
+
+document.addEventListener('DOMContentLoaded', () => {
     
-    const registerForm = document.getElementById("register-form");
-    const errorBox = document.getElementById("error-box");
+    const registerForm = document.getElementById('register-form'); // ‼️ HTML ต้องมี <form id="register-form">
+    const submitButton = document.getElementById('submit-btn'); // ‼️ HTML ต้องมี <button id="submit-btn">
 
-    registerForm.addEventListener("submit", async (event) => {
-        event.preventDefault(); // หยุดการ submit แบบปกติ
+    registerForm.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        submitButton.disabled = true;
+        submitButton.textContent = 'Registering...';
+        showMessage('form-message', '', 'success'); // ‼️ HTML ต้องมี <div id="form-message">
 
-        // 1. ซ่อน Error box (ถ้าเคยโชว์)
-        errorBox.style.display = "none";
-        errorBox.textContent = "";
+        // ‼️ รวบรวมข้อมูลทั้งหมดจากฟอร์มของคุณ (เช่น username, email, password)
+        const username = document.getElementById('username').value;
+        const password = document.getElementById('password').value;
+        const email = document.getElementById('email').value;
+        // (เพิ่ม first_name, last_name ถ้ามี)
 
-        // 2. รวบรวมข้อมูลจากฟอร์ม
-        const username = document.getElementById("username").value;
-        const email = document.getElementById("email").value;
-        const password = document.getElementById("password").value;
-        const firstName = document.getElementById("first_name").value;
-        const lastName = document.getElementById("last_name").value;
+        // ‼️ สร้าง 'data' object ให้ตรงกับ API Serializer ของคุณ
+        const data = {
+            username: username,
+            password: password,
+            email: email
+        };
 
         try {
-            // 3. ยิง API ไปที่ Endpoint สมัครสมาชิก
-            const response = await fetch("https://helpdesk-api-z5q9.onrender.com/api/register/", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    username: username,
-                    email: email,
-                    password: password,
-                    first_name: firstName,
-                    last_name: lastName
-                    // (เราไม่ต้องส่ง 'role' เพราะ Backend จะ default เป็น 'user' ให้อัตโนมัติ)
-                }),
+            // (API_BASE_URL มาจาก api.js)
+            // ‼️ Endpoint นี้ต้องตรงกับ API สร้าง User ของคุณ
+            const response = await fetch(`${API_BASE_URL}/api/register/`, { // 👈 ‼️ แก้ไข Endpoint
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
             });
 
-            const data = await response.json();
+            const result = await response.json();
 
-            if (response.status === 201) {
-                // 4. ถ้าสมัครสำเร็จ (201 Created)
-                alert("Registration successful! You will now be redirected to the login page.");
-                // 5. พาไปหน้า Login
-                window.location.href = "index.html";
-
+            if (response.ok) {
+                showMessage('form-message', 'Registration successful! Redirecting to login...', 'success');
+                setTimeout(() => {
+                    // ‼️ แก้ชื่อไฟล์ ถ้าหน้าล็อกอินของคุณคือ 'index.html'
+                    window.location.href = 'login.html';
+                }, 2000);
             } else {
-                // 6. ถ้า Error (เช่น 400 Bad Request)
-                // (โค้ดนี้จะพยายามหา Error แรกที่ Django ส่งมาแสดง)
-                let errorMessage = "Registration failed. Please try again.";
-                
-                // (Django มักส่ง Error มาในรูปแบบ object { field: ["message"] })
-                if (data.username) {
-                    errorMessage = `Username: ${data.username[0]}`;
-                } else if (data.email) {
-                    errorMessage = `Email: ${data.email[0]}`;
-                } else if (data.password) {
-                    errorMessage = `Password: ${data.password[0]}`;
-                }
-
-                errorBox.textContent = errorMessage;
-                errorBox.style.display = "block";
+                throw new Error(JSON.stringify(result));
             }
-
-        } catch (error)
-        {
-            console.error("Fetch Error:", error);
-            errorBox.textContent = "Could not connect to the server.";
-            errorBox.style.display = "block";
+        } catch (error) {
+            console.error('Register error:', error);
+            showMessage('form-message', `Error: ${error.message}`, 'error');
+            submitButton.disabled = false;
+            submitButton.textContent = 'Register';
         }
     });
 });

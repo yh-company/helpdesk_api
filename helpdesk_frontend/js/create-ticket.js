@@ -8,8 +8,7 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
     }
     
-    const ticketForm = document.getElementById('create-ticket-form');
-    const messageDiv = document.getElementById('form-message');
+    const ticketForm = document.getElementById('create-ticket-form'); // ‼️ HTML ต้องมี <form id="create-ticket-form">
     const submitButton = document.getElementById('submit-btn');
     const token = getToken(); // (ฟังก์ชันจาก api.js)
 
@@ -17,19 +16,14 @@ document.addEventListener('DOMContentLoaded', () => {
         event.preventDefault(); 
         submitButton.disabled = true;
         submitButton.textContent = 'Submitting...';
-        messageDiv.textContent = ''; 
+        showMessage('form-message', '', 'success'); // ‼️ HTML ต้องมี <div id="form-message">
 
+        // ‼️ รวบรวมข้อมูลจากฟอร์ม
         const title = document.getElementById('title').value;
         const description = document.getElementById('description').value;
         const priority = document.getElementById('priority').value;
 
-        if (!title) {
-            showMessage('Please enter a title.', 'error');
-            submitButton.disabled = false;
-            submitButton.textContent = 'Submit Ticket';
-            return;
-        }
-
+        // ‼️ ตรวจสอบชื่อ Key (title, description) ให้ตรงกับ Serializer
         const data = {
             title: title,
             description: description,
@@ -38,7 +32,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
         try {
             // (API_BASE_URL มาจาก api.js)
-            const response = await fetch(`https://helpdesk-api-z5q9.onrender.com/api/tickets/`, { 
+            // ‼️ Endpoint นี้ต้องตรงกับ API สร้าง Ticket
+            const response = await fetch(`${API_BASE_URL}/api/tickets/`, { 
                 method: 'POST', 
                 headers: {
                     'Content-Type': 'application/json',
@@ -48,9 +43,10 @@ document.addEventListener('DOMContentLoaded', () => {
             });
 
             if (response.ok) { 
-                showMessage('Ticket created successfully! Redirecting...', 'success');
+                showMessage('form-message', 'Ticket created successfully! Redirecting...', 'success');
                 setTimeout(() => {
-                    window.location.href = 'mytickets.html'; // 👈 เด้งกลับไปหน้า List
+                    // ‼️ แก้ชื่อไฟล์ ถ้าหน้า List ของคุณคือ 'dashboard-user.html'
+                    window.location.href = 'mytickets.html'; 
                 }, 2000);
             } else {
                 const errorData = await response.json();
@@ -59,14 +55,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
         } catch (error) {
             console.error('Error creating ticket:', error);
-            showMessage(`Error: ${error.message}`, 'error');
+            showMessage('form-message', `Error: ${error.message}`, 'error');
             submitButton.disabled = false;
             submitButton.textContent = 'Submit Ticket';
         }
     });
-
-    function showMessage(message, type) {
-        messageDiv.textContent = message;
-        messageDiv.style.color = (type === 'error') ? 'red' : 'green';
-    }
 });

@@ -3,24 +3,25 @@
 document.addEventListener('DOMContentLoaded', () => {
     // (ฟังก์ชันจาก api.js) ถ้าล็อกอินอยู่แล้ว ให้เด้งไปหน้า My Tickets เลย
     if (isAuthenticated()) {
+        // ‼️ แก้ชื่อไฟล์ ถ้าหน้า List ของคุณคือ 'dashboard-user.html'
         window.location.href = 'mytickets.html';
+        return;
     }
 
-    const loginForm = document.getElementById('login-form');
-    const messageDiv = document.getElementById('form-message');
-    const submitButton = document.getElementById('submit-btn');
+    const loginForm = document.getElementById('login-form'); // ‼️ HTML ต้องมี <form id="login-form">
+    const submitButton = document.getElementById('submit-btn'); // ‼️ HTML ต้องมี <button id="submit-btn">
 
     loginForm.addEventListener('submit', async (event) => {
         event.preventDefault();
         submitButton.disabled = true;
         submitButton.textContent = 'Logging in...';
-        messageDiv.textContent = '';
+        showMessage('form-message', '', 'success'); // ‼️ HTML ต้องมี <div id="form-message">
 
-        const username = document.getElementById('username').value;
-        const password = document.getElementById('password').value;
+        const username = document.getElementById('username').value; // ‼️ HTML ต้องมี <input id="username">
+        const password = document.getElementById('password').value; // ‼️ HTML ต้องมี <input id="password">
 
         try {
-            // (API_BASE_URL มาจากไฟล์ api.js ที่เราโหลดก่อนหน้า)
+            // (API_BASE_URL มาจากไฟล์ api.js)
             // ‼️ Endpoint นี้ต้องตรงกับ Django simple-jwt
             const response = await fetch(`${API_BASE_URL}/api/token/`, { 
                 method: 'POST',
@@ -38,22 +39,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 saveToken(data.access); 
                 
                 // เด้งไปหน้า My Tickets
+                // ‼️ แก้ชื่อไฟล์ ถ้าหน้า List ของคุณคือ 'dashboard-user.html'
                 window.location.href = 'mytickets.html';
             } else {
-                // (เช่น รหัสผ่านผิด)
                 throw new Error(data.detail || 'Failed to login');
             }
 
         } catch (error) {
             console.error('Login error:', error);
-            showMessage(`Error: ${error.message}`, 'error');
+            showMessage('form-message', `Error: ${error.message}`, 'error');
             submitButton.disabled = false;
             submitButton.textContent = 'Login';
         }
     });
-
-    function showMessage(message, type) {
-        messageDiv.textContent = message;
-        messageDiv.style.color = (type === 'error') ? 'red' : 'green';
-    }
 });
