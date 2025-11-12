@@ -1,7 +1,7 @@
 // js/api.js
 
 // ‼️‼️‼️ สำคัญมาก: แก้ไข URL นี้ ให้เป็น URL ของ "Backend (Web Service)" ของคุณ
-const API_BASE_URL = "https://helpdesk-api-z5q9.onrender.com/"; // 👈 ‼️‼️ แก้ไขตรงนี้
+const API_BASE_URL = "https://helpdesk-api-z5q9.onrender.com"; // 👈 ‼️‼️ แก้ไขตรงนี้
 
 /**
  * บันทึก Token ลงใน localStorage
