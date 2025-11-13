@@ -1,6 +1,6 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from .views import TicketViewSet, CommentViewSet # 1. Import ViewSet
+from .views import TicketViewSet, CommentViewSet 
 
 router = DefaultRouter()
 

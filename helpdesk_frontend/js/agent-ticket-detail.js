@@ -1,5 +1,8 @@
 // js/agent-ticket-detail.js
+// ‼️ เวอร์ชันสมบูรณ์: แก้ไข POST/PATCH ให้ตรงกับ Backend Serializer (body, status) ‼️
+
 document.addEventListener('DOMContentLoaded', () => {
+    // 1. ตรวจสอบการล็อกอิน
     if (!isAuthenticated()) {
         logout();
         return;
@@ -18,15 +21,23 @@ document.addEventListener('DOMContentLoaded', () => {
     const commentForm = document.getElementById('comment-form');
     const commentText = document.getElementById('comment-text');
     const commentSubmitBtn = document.getElementById('comment-submit-btn');
+    const commentMessage = document.getElementById('comment-message'); // 👈 เพิ่มไว้แสดง Error/Success
     
-    // (Element ใหม่ของ Agent)
+    // (Element ของ Agent)
     const statusSelect = document.getElementById('status-select');
     const updateTicketBtn = document.getElementById('update-ticket-btn');
+    const updateMessage = document.getElementById('update-message'); // 👈 เพิ่มไว้แสดง Error/Success
+
+    // Helper function สำหรับแสดงข้อความ Error/Success
+    function showAgentMessage(element, message, type = 'error') {
+        if (element) {
+            element.innerHTML = `<span style="color: ${type === 'error' ? 'red' : 'green'};">${message}</span>`;
+        }
+    }
 
     // --- (ฟังก์ชันที่ 1: ดึง Ticket) ---
     async function fetchTicketDetails() {
         try {
-            // (Agent ดึงข้อมูล Ticket)
             const response = await fetch(`${API_BASE_URL}/api/tickets/${ticketId}/`, {
                 method: 'GET',
                 headers: { 'Authorization': `Bearer ${token}` }
@@ -35,37 +46,43 @@ document.addEventListener('DOMContentLoaded', () => {
             const ticket = await response.json();
             renderTicketDetails(ticket); 
         } catch (error) {
-            console.error("Fetch Ticket Error:", error);
-            detailsContainer.innerHTML = `<p style="color: red;">${error.message}</p>`;
+            detailsContainer.innerHTML = `<p style="color: red;">Error: ${error.message}</p>`;
         }
     }
     
     // --- (ฟังก์ชันที่ 2: ดึง Comments) ---
     async function fetchComments() {
         try {
-            // (Agent ดึง Comments)
             const response = await fetch(`${API_BASE_URL}/api/comments/?ticket=${ticketId}`, { 
                 method: 'GET',
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             if (!response.ok) throw new Error('Failed to fetch comments');
-            const comments = await response.json();
-            renderComments(comments); 
+
+            // ✅ (ถูกต้อง) แก้ไข Pagination .results แล้ว
+            const data = await response.json();
+            renderComments(data.results); 
+
         } catch (error) {
-            console.error("Fetch Comments Error:", error);
-            commentsList.innerHTML = `<p style="color: red;">${error.message}</p>`;
+            commentsList.innerHTML = `<p style="color: red;">Error fetching comments.</p>`;
         }
     }
     
     // --- (ฟังก์ชันที่ 3: วาด Ticket) ---
     function renderTicketDetails(ticket) {
         const lastUpdated = new Date(ticket.updated_at).toLocaleString();
+        
+        // ‼️ (สำคัญ) เนื่องจาก Serializer ใช้ StringRelatedField: created_by จะเป็นชื่อ User (String) 
+        // ไม่ใช่ Object ที่มี .username
+        const createdByUser = ticket.created_by || 'N/A'; 
+
         detailsContainer.innerHTML = `
             <div style="display: flex; justify-content: space-between; align-items: center;">
                 <h1>${ticket.title}</h1>
                 <span class="status-tag status-${ticket.status.toLowerCase()}">${ticket.status}</span>
             </div>
-            <p><strong>From User:</strong> ${ticket.user.username}</p> 
+            
+            <p><strong>From User:</strong> ${createdByUser}</p> 
             <p><strong>Priority:</strong> ${ticket.priority}</p>
             <p><strong>Last Updated:</strong> ${lastUpdated}</p><hr>
             <p>${ticket.description}</p>
@@ -76,6 +93,10 @@ document.addEventListener('DOMContentLoaded', () => {
             commentForm.style.display = 'none';
             statusSelect.disabled = true;
             updateTicketBtn.disabled = true;
+        } else {
+             commentForm.style.display = 'block'; // แสดงฟอร์ม Comment
+             statusSelect.disabled = false;
+             updateTicketBtn.disabled = false;
         }
     }
 
@@ -88,10 +109,14 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         comments.forEach(comment => {
             const commentDate = new Date(comment.created_at).toLocaleString();
+            
+            // ‼️ (สำคัญ) เนื่องจาก Serializer ใช้ StringRelatedField: user จะเป็นชื่อ User (String)
+            const commentUser = comment.user || 'Unknown Agent/User';
+            
             commentsList.innerHTML += `
                 <div class="comment-card">
-                    <strong>${comment.user.username}</strong> <small>on ${commentDate}</small>
-                    <p>${comment.text}</p>
+                    <strong>${commentUser}</strong> <small>on ${commentDate}</small>
+                    <p>${comment.body}</p> 
                 </div>
             `;
         });
@@ -101,11 +126,17 @@ document.addEventListener('DOMContentLoaded', () => {
     commentForm.addEventListener('submit', async (event) => {
         event.preventDefault();
         commentSubmitBtn.disabled = true;
-        const text = commentText.value;
-        if (!text) return; 
+        commentMessage.textContent = ''; // ล้างข้อความเก่า
         
-        // ‼️ (สำคัญ) เช็ก API doc ว่า Key ชื่อ 'ticket' หรือ 'ticket_id'
-        const data = { text: text, ticket: ticketId }; 
+        const text = commentText.value;
+        if (!text) {
+             commentSubmitBtn.disabled = false; 
+             return; 
+        }
+        
+        // ✅ (FIXED) ส่ง Key 'body' (ตาม Comment Serializer)
+        const data = { body: text, ticket: ticketId }; 
+        
         try {
             const response = await fetch(`${API_BASE_URL}/api/comments/`, {
                 method: 'POST',
@@ -115,13 +146,14 @@ document.addEventListener('DOMContentLoaded', () => {
             if (response.ok) {
                 commentText.value = ''; 
                 fetchComments(); // โหลด Comment ใหม่อย่างเดียว
+                showAgentMessage(commentMessage, 'Reply posted!', 'success');
             } else {
                 const err = await response.json();
                 throw new Error(JSON.stringify(err));
             }
         } catch (error) {
             console.error("Comment Post Error:", error);
-            showMessage('comment-message', `Error: ${error.message}`, 'error');
+            showAgentMessage(commentMessage, `Error posting comment: ${error.message}`, 'error');
         } finally {
             commentSubmitBtn.disabled = false;
         }
@@ -130,8 +162,9 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- (ฟังก์ชันที่ 6: "ดัก" การอัปเดตสถานะของ Agent) ---
     updateTicketBtn.addEventListener('click', async () => {
         const newStatus = statusSelect.value;
-        // (ส่ง "เฉพาะ" สิ่งที่เปลี่ยน)
         const data = { status: newStatus };
+        updateTicketBtn.disabled = true;
+        updateMessage.textContent = ''; // ล้างข้อความเก่า
 
         try {
             // ‼️ Endpoint นี้คือการ "อัปเดต" (PATCH) Ticket
@@ -145,8 +178,8 @@ document.addEventListener('DOMContentLoaded', () => {
             });
 
             if (response.ok) {
-                showMessage('update-message', 'Ticket updated successfully!', 'success');
-                fetchTicketDetails(); // โหลดข้อมูล Ticket ใหม่อีกครั้ง (เพื่ออัปเดตหน้าจอ)
+                showAgentMessage(updateMessage, 'Ticket updated successfully!', 'success');
+                fetchTicketDetails(); // โหลดข้อมูล Ticket ใหม่อีกครั้ง
             } else {
                 const err = await response.json();
                 throw new Error(JSON.stringify(err));
@@ -154,7 +187,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
         } catch (error) {
             console.error("Update Ticket Error:", error);
-            showMessage('update-message', `Error: ${error.message}`, 'error');
+            showAgentMessage(updateMessage, `Error updating status: ${error.message}`, 'error');
+        } finally {
+            updateTicketBtn.disabled = false;
         }
     });
 

@@ -1,4 +1,5 @@
 // js/ticket-detail.js
+// ‼️ (เวอร์ชันแก้ไขสมบูรณ์ - แก้ไข Key 'user' ที่ไม่ตรงกัน) ‼️
 
 document.addEventListener('DOMContentLoaded', () => {
 
@@ -17,13 +18,12 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     const token = getToken();
-    const detailsContainer = document.getElementById('ticket-details'); // ‼️ HTML ต้องมี <div id="ticket-details">
-    // (ส่วนของ Comment)
-    const commentsList = document.getElementById('comments-list'); // ‼️ HTML ต้องมี <div id="comments-list">
-    const commentForm = document.getElementById('comment-form'); // ‼️ HTML ต้องมี <form id="comment-form">
-    const commentText = document.getElementById('comment-text'); // ‼️ HTML ต้องมี <textarea id="comment-text">
+    const detailsContainer = document.getElementById('ticket-details'); 
+    const commentsList = document.getElementById('comments-list'); 
+    const commentForm = document.getElementById('comment-form'); 
+    const commentText = document.getElementById('comment-text'); 
     const commentSubmitBtn = document.getElementById('comment-submit-btn');
-    const commentMessage = document.getElementById('comment-message'); // ‼️ HTML ต้องมี <div id="comment-message">
+    const commentMessage = document.getElementById('comment-message'); 
 
     // 2. ฟังก์ชันสำหรับดึงข้อมูล "Ticket"
     async function fetchTicketDetails() {
@@ -45,11 +45,12 @@ document.addEventListener('DOMContentLoaded', () => {
     async function fetchComments() {
         try {
             const response = await fetch(`${API_BASE_URL}/api/comments/?ticket=${ticketId}`, { 
-                method: 'GET',
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
+        method: 'GET',
+        headers: { 'Authorization': `Bearer ${token}` }
+    });
             if (!response.ok) throw new Error('Failed to fetch comments');
             
+            // ✅ (ถูกต้อง) แก้ไขเรื่อง Pagination .results แล้ว
             const responseData = await response.json();
             renderComments(responseData.results); 
         } catch (error) {
@@ -58,12 +59,17 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // --- (เพิ่ม) ฟังก์ชัน renderTicketDetails ---
+    // --- (ฟังก์ชัน renderTicketDetails) ---
     function renderTicketDetails(ticket) {
         if (!detailsContainer) return;
         
         const created = new Date(ticket.created_at).toLocaleString();
         const updated = new Date(ticket.updated_at).toLocaleString();
+
+        // ⭐️ --- (จุดที่แก้ไข 1) --- ⭐️
+        // API ส่ง 'user' (ที่เป็น Object) ไม่ใช่ 'created_by_username' (ที่เป็น String)
+        const username = ticket.user ? ticket.user.username : 'Unknown';
+        // ⭐️ --- (สิ้นสุดจุดที่แก้ไข) --- ⭐️
 
         detailsContainer.innerHTML = `
             <h3>${ticket.title}</h3>
@@ -74,39 +80,48 @@ document.addEventListener('DOMContentLoaded', () => {
             <p><strong>Description:</strong></p>
             <p>${ticket.description || 'No description provided.'}</p>
             <hr>
-            <small>Created by: ${ticket.created_by_username || 'Unknown'} at ${created}</small><br>
+            <small>Created by: ${username} at ${created}</small><br>
             <small>Last updated: ${updated}</small>
         `;
-    }
 
-    // --- (เพิ่ม) ฟังก์ชัน renderComments ---
-    function renderComments(comments) {
-        if (!commentsList) return;
-
-        commentsList.innerHTML = ''; // ล้างของเก่า
-        if (!comments || comments.length === 0) {
-            commentsList.innerHTML = '<p>No comments yet.</p>';
-            return;
+        // (ถ้า Ticket ปิดไปแล้ว User ก็ Comment ไม่ได้)
+        if (ticket.status === 'CLOSED') {
+            commentForm.style.display = 'none';
         }
-
-        comments.forEach(comment => {
-            const created = new Date(comment.created_at).toLocaleString();
-            
-            const commentEl = document.createElement('div');
-            commentEl.className = 'comment-card';
-            
-            // --- ⭐️ จุดที่แก้ไขอยู่ตรงนี้ ⭐️ ---
-            // เปลี่ยน comment.text เป็น comment.body
-            commentEl.innerHTML = `
-                <p>${comment.body}</p> 
-                <small>By: <strong>${comment.author_username || 'Unknown'}</strong> at ${created}</small>
-            `;
-            // --- ⭐️ สิ้นสุดจุดที่แก้ไข ⭐️ ---
-
-            commentsList.appendChild(commentEl);
-        });
     }
 
+    // --- (ฟังก์ชัน renderComments) ---
+    function renderComments(comments) {
+    
+    const commentsList = document.getElementById('comments-list'); 
+    if (!commentsList) return; 
+
+    commentsList.innerHTML = ''; 
+    
+   
+    if (!Array.isArray(comments) || comments.length === 0) { 
+        commentsList.innerHTML = '<p>No comments yet.</p>';
+        return;
+    }
+
+    comments.forEach(comment => {
+        const commentDate = new Date(comment.created_at).toLocaleString();
+        
+      
+        const usernameDisplay = comment.user || 'Unknown User'; 
+        
+        
+        const commentBody = comment.body || 'No text provided.'; 
+        
+        commentsList.innerHTML += `
+            <div class="comment-card">
+                <strong>${usernameDisplay}</strong> <small>on ${commentDate}</small> 
+                
+                <p>${commentBody}</p> 
+            </div>
+        `;
+    });
+}
     // 4. "ดัก" การ submit Comment ใหม่
     commentForm.addEventListener('submit', async (event) => {
         event.preventDefault();
@@ -118,8 +133,9 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
+        // ✅ (ถูกต้อง) ใช้ 'body: text' แล้ว
         const data = {
-            body: text,      // 👈 ‼️ (อันนี้ถูกต้องแล้ว)
+            body: text, 
             ticket: ticketId 
         };
 
