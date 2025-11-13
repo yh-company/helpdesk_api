@@ -1,4 +1,3 @@
-/* style.css */
 body {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     background-color: #f4f7f6;
@@ -21,7 +20,7 @@ h1 {
     margin-top: 0;
 }
 
-/* --- Card Styles --- */
+
 .card-list {
     margin-top: 20px;
 }
@@ -52,7 +51,7 @@ h1 {
     color: #777;
 }
 
-/* --- Status Tags --- */
+
 .status-tag {
     font-size: 12px;
     font-weight: bold;
@@ -64,7 +63,7 @@ h1 {
 .status-in_progress { background-color: #ffc107; color: #333; }
 .status-closed { background-color: #6c757d; }
 
-/* --- Form Styles --- */
+
 .form-group {
     margin-bottom: 15px;
 }
@@ -80,13 +79,13 @@ h1 {
     padding: 10px;
     border: 1px solid #ccc;
     border-radius: 4px;
-    box-sizing: border-box; /* Important! */
+    box-sizing: border-box; 
 }
 textarea {
     resize: vertical;
 }
 
-/* --- Button Styles --- */
+
 .btn {
     padding: 10px 15px;
     border: none;
@@ -103,7 +102,7 @@ textarea {
     background-color: #a0cfff;
 }
 
-/* --- Comment Styles --- */
+
 .comment-card {
     background-color: #f9f9f9;
     border: 1px solid #eee;
@@ -119,43 +118,41 @@ textarea {
     color: #888;
 }
 
-/* --- 
-   โค้ดสำหรับเพิ่ม (สำหรับหน้า Login/Register)
---- */
 
-/* 1. ทำให้ body เต็มจอและจัดกลาง */
+
+
 .full-center-page {
     display: flex;
     justify-content: center;
     align-items: center;
     min-height: 100vh;
-    background-color: #f0f4f8; /* ธีมสีฟ้าอ่อนๆ */
-    padding: 0; /* ล้าง padding เดิมของ body */
+    background-color: #f0f4f8; 
+    padding: 0; 
 }
 
-/* 2. กำหนดขนาดกล่อง Login ให้เหมาะสม */
+
 .auth-container {
-    max-width: 400px; /* จำกัดความกว้างกล่อง login */
+    max-width: 400px; 
     width: 100%;
     margin: 20px;
-    padding: 30px; /* เพิ่ม padding ภายใน */
+    padding: 30px; 
 }
 
-/* 3. ทำให้ปุ่ม Login เต็มความกว้าง */
+
 .auth-container .btn-primary {
     width: 100%;
     padding: 12px;
     font-size: 16px;
 }
 
-/* 4. เพิ่ม Hover Effect ให้ปุ่ม (สีฟ้าเข้มขึ้น) */
+
 .btn-primary:hover:not(:disabled) {
     background-color: #0056b3;
 }
 
-/* 5. ปรับสไตล์ลิงก์ "Create one" */
+
 .auth-container p a {
-    color: #007bff; /* สีฟ้า */
+    color: #007bff; 
     text-decoration: none;
     font-weight: 500;
 }
@@ -163,11 +160,11 @@ textarea {
     text-decoration: underline;
 }
 
-/* 6. (แนะนำ) สไตล์สำหรับข้อความ Error (จาก #form-message) */
+
 #form-message {
-    color: #dc3545; /* สีแดง */
+    color: #dc3545; 
     font-size: 14px;
     text-align: center;
-    margin-bottom: 15px; /* เว้นช่องว่างก่อนปุ่ม */
-    min-height: 1.2em; /* จองที่ไว้ กันปุ่มกระโดด */
+    margin-bottom: 15px; 
+    min-height: 1.2em; 
 }
