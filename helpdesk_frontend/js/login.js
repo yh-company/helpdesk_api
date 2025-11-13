@@ -35,12 +35,20 @@ document.addEventListener('DOMContentLoaded', () => {
             const data = await response.json();
 
             if (response.ok) {
-                // ✅ สำเร็จ! บันทึก Token (ใช้ฟังก์ชันจาก api.js)
+                // 1. บันทึก Token (เหมือนเดิม)
                 saveToken(data.access); 
                 
-                // เด้งไปหน้า My Tickets
-                // ‼️ แก้ชื่อไฟล์ ถ้าหน้า List ของคุณคือ 'dashboard-user.html'
-                window.location.href = 'mytickets.html';
+                
+                const decoded = decodeToken(data.access);
+                
+                
+                if (decoded && decoded.is_staff) {
+                    // Agent: ไปหน้า Agent Dashboard
+                    window.location.href = 'dashboard-agent.html';
+                } else {
+                    //  User ธรรมดา: ไปหน้า My Tickets
+                    window.location.href = 'mytickets.html';
+                }
             } else {
                 throw new Error(data.detail || 'Failed to login');
             }

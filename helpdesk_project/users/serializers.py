@@ -27,3 +27,23 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
             role=validated_data.get('role', 'user') 
         )
         return user
+    
+# users/serializers.py
+
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+
+class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
+    """
+    Custom Serializer สำหรับเพิ่มข้อมูลอื่นๆ เข้าไปใน JWT Payload
+    เราจะเพิ่ม is_staff เข้าไปใน "access" token
+    """
+    @classmethod
+    def get_token(cls, user):
+        # 1. ดึง Token เดิม
+        token = super().get_token(user)
+
+        # 2. ‼️ (สำคัญ) เพิ่ม Custom Claims ของเรา
+        token['is_staff'] = user.is_staff
+        token['username'] = user.username # (แถม username ให้ด้วยเลย)
+        
+        return token

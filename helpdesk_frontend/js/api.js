@@ -33,7 +33,7 @@ function isAuthenticated() {
 function logout() {
     localStorage.removeItem('token');
     // ‼️ แก้ชื่อไฟล์ ถ้าหน้าล็อกอินของคุณคือ 'index.html'
-    window.location.href = '/login.html'; 
+    window.location.href = '/index.html'; 
 }
 
 /**
@@ -47,5 +47,23 @@ function showMessage(elementId, message, type = 'error') {
     if (messageDiv) {
         messageDiv.textContent = message;
         messageDiv.style.color = (type === 'error') ? 'red' : 'green';
+    }
+}
+
+function decodeToken(token) {
+    try {
+        // ส่วน Payload อยู่ที่ตำแหน่งที่ 2 (index 1) ใน JWT 
+        const base64Url = token.split('.')[1]; 
+        // แปลง Base64-URL Safe เป็น String 
+        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/'); 
+        // ถอดรหัสและแปลงเป็น JSON Object
+        const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+            return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+        }).join(''));
+
+        return JSON.parse(jsonPayload);
+    } catch (e) {
+        console.error("Failed to decode token:", e);
+        return null; // Token เสียหายหรือไม่ถูกต้อง
     }
 }

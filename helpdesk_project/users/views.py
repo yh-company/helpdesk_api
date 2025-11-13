@@ -3,6 +3,7 @@ from rest_framework.response import Response
 from rest_framework.permissions import AllowAny 
 from .models import User
 from .serializers import UserRegistrationSerializer
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
 class UserRegistrationViewSet(mixins.CreateModelMixin,
                               viewsets.GenericViewSet):
@@ -25,6 +26,8 @@ class UserRegistrationViewSet(mixins.CreateModelMixin,
             status=status.HTTP_201_CREATED,
             headers=headers
         )
+    
+
 
 
 
